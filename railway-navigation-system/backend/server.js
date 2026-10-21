@@ -9,6 +9,7 @@ const stationRoutes = require("./routes/stationRoutes");
 const facilityRoutes = require("./routes/facilityRoutes");
 const navigationRoutes = require("./routes/navigationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/api/stations", stationRoutes);
 app.use("/api/facilities", facilityRoutes);
 app.use("/api/navigation", navigationRoutes); // nodes, paths, /route
 app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes);
 
 // 5. Catch-all for unknown API routes
 app.use("/api", (req, res) => {

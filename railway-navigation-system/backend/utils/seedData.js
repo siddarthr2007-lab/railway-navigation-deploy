@@ -10,6 +10,7 @@ const Facility = require("../models/Facility");
 const NavigationNode = require("../models/NavigationNode");
 const NavigationPath = require("../models/NavigationPath");
 const Admin = require("../models/Admin");
+const User = require("../models/User");
 
 const stationsData = [
   // --- CHENNAI & NORTHERN TAMIL NADU ---
@@ -676,6 +677,19 @@ async function seed(disconnectOnFinish = false) {
     email: "admin@railnav.local",
   });
   console.log("Default admin created -> username: admin, password: admin123");
+
+  // 5. Create default passenger user
+  await User.deleteMany({});
+  const sampleStation = stations[0]; // e.g. MAS
+  await User.create({
+    name: "Passenger Siddarth",
+    email: "passenger@navigo.com",
+    password: "user123",
+    phone: "+91 98765 43210",
+    preferredAccessibility: true,
+    savedStations: sampleStation ? [sampleStation._id] : [],
+  });
+  console.log("Default passenger user created -> email: passenger@navigo.com, password: user123");
 
   console.log("\n========================================================");
   console.log(`Seeding complete! All ${stations.length} Tamil Nadu stations now have:`);

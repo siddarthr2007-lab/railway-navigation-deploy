@@ -33,6 +33,18 @@ function Navigation() {
       // Default to platform 1 or platform 2
       const dest = res.data.find((f) => f.name.includes("Platform 1") || f.type === "platform");
       if (dest) setToId(dest._id);
+
+      if (entrance?.navigationNodeId && dest?.navigationNodeId) {
+        calculateRoute({
+          stationId: id,
+          fromNodeId: entrance.navigationNodeId,
+          toNodeId: dest.navigationNodeId,
+          wheelchair: false,
+        }).then((routeRes) => {
+          setRoute(routeRes.data);
+          setActiveStepIndex(0);
+        }).catch(() => {});
+      }
     }).catch(() => {});
   }, [id]);
 

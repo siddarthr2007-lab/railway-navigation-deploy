@@ -1,0 +1,6 @@
+node_modules
+dist
+.env
+extracted_images/
+report_assets/
+test_shot.png

@@ -4,6 +4,7 @@ import MapView from "../components/MapView";
 import FacilityCard from "../components/FacilityCard";
 import { getStation } from "../services/stationService";
 import { getFacilitiesByStation } from "../services/facilityService";
+import { toggleFavoriteStation } from "../services/userService";
 
 function StationDetail() {
   const { id } = useParams();
@@ -12,6 +13,39 @@ function StationDetail() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [savingFav, setSavingFav] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("userSavedStations") || "[]");
+      const hasFav = saved.some((s) => (typeof s === "string" ? s : s?._id) === id);
+      setIsFavorited(hasFav);
+    } catch {
+      setIsFavorited(false);
+    }
+  }, [id]);
+
+  const handleToggleFavorite = async () => {
+    const userId = localStorage.getItem("userId");
+    const isLoggedIn = localStorage.getItem("isUserLoggedIn") === "true";
+    if (!isLoggedIn || !userId) {
+      window.location.href = `/login?redirect=/stations/${id}`;
+      return;
+    }
+
+    setSavingFav(true);
+    try {
+      const res = await toggleFavoriteStation(userId, id);
+      setIsFavorited(res.data.isFavorited);
+      localStorage.setItem("userSavedStations", JSON.stringify(res.data.savedStations || []));
+      window.dispatchEvent(new Event("userFavoritesChange"));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingFav(false);
+    }
+  };
 
   useEffect(() => {
     getStation(id).then((res) => setStation(res.data)).catch(() => setError("Station not found"));
@@ -44,9 +78,20 @@ function StationDetail() {
           <p className="station-description">{station.description}</p>
         </div>
 
-        <Link to={`/stations/${id}/navigate`} className="launch-nav-btn">
-          🚀 Open Live NaviGo Navigation →
-        </Link>
+        <div className="station-banner-actions">
+          <button
+            type="button"
+            className={`station-banner-fav-btn ${isFavorited ? "favorited" : ""}`}
+            onClick={handleToggleFavorite}
+            disabled={savingFav}
+            title={isFavorited ? "Remove from bookmarked stations" : "Bookmark this station"}
+          >
+            {isFavorited ? "★ Bookmarked" : "☆ Bookmark Station"}
+          </button>
+          <Link to={`/stations/${id}/navigate`} className="launch-nav-btn">
+            🚀 Open Live NaviGo Navigation →
+          </Link>
+        </div>
       </div>
 
       <div className="station-body">

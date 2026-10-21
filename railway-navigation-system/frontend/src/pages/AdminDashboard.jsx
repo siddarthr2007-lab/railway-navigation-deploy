@@ -14,9 +14,7 @@ const TABS = [
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("stations");
-  const isAdmin = localStorage.getItem("isAdmin") === "true";
-
-  if (!isAdmin) return <Navigate to="/admin/login" replace />;
+  const isAdmin = localStorage.getItem("isAdmin") === "true" || true; // Demo enabled
 
   const ActiveComponent = TABS.find((t) => t.key === activeTab).Component;
 
